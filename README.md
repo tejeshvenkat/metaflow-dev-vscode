@@ -7,14 +7,25 @@ This lightweight VS Code extension supercharges your Metaflow dev workflow:
 3. Point at a step, edit it, and _spin_ it with **Ctrl + Opt + S** for quick results ⚡
 4. Rinse and repeat 2-3
 
-The extension automatically:
+## Commands
 
-* Detects the current function name (`def` or `async def`)
-* Saves the file before running
-* Executes the command in the file’s directory
-* Reuses a shared terminal session
+| Command | Purpose | Keyboard Shortcut | Runs |
+|---------|---------|-------------------|------|
+| **Run a flow** | Execute the entire Metaflow flow | `Ctrl+Alt+R` | `python <file> run` |
+| **Spin the current step** | Run only the step under the cursor for fast iteration | `Ctrl+Alt+S` | `python <file> spin <step_name>` |
 
-##  Installation
+Both commands are available when editing a Python file (`editorLangId == python`).
+
+**Python interpreter resolution:** The extension uses the interpreter selected in VS Code. If the [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) is installed and an interpreter is chosen (venv, conda, pyenv, etc.), that interpreter is used. Otherwise, it falls back to `python` from the system PATH.
+
+## How the Extension Works
+
+1. **Detects the current Python function** — Finds the nearest `def` or `async def` above the cursor to determine which step to run or spin.
+2. **Saves the file before execution** — Ensures your latest changes are used.
+3. **Reuses a shared terminal** — Uses a single "Metaflow Runner" terminal to avoid cluttering the terminal panel.
+4. **Uses the selected VS Code Python interpreter** — Respects `python.defaultInterpreterPath` from the Python extension when available.
+
+## Installation
 
 1. **Clone or copy** this repository to a local folder
 
