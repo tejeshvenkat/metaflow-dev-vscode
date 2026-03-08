@@ -4,6 +4,23 @@ const path = require('path');
 let sharedTerminal = null;
 
 /**
+ * Get the Python executable path from VS Code's configured interpreter.
+ * Uses the Python extension's defaultInterpreterPath when available,
+ * otherwise falls back to 'python' from PATH.
+ */
+function getPythonExecutable() {
+  const config = vscode.workspace.getConfiguration('python');
+  const interpreterPath = config.get('defaultInterpreterPath');
+  if (interpreterPath && typeof interpreterPath === 'string') {
+    const trimmed = interpreterPath.trim();
+    if (trimmed.length > 0) {
+      return trimmed;
+    }
+  }
+  return 'python';
+}
+
+/**
  * Core function to detect the current Python function name and run a script.
  */
 async function runPythonCommand(scriptName) {
@@ -33,12 +50,17 @@ async function runPythonCommand(scriptName) {
 
   const filePath = doc.fileName;
   const fileDir = path.dirname(filePath);
+  const pythonExecutable = getPythonExecutable();
+
+  // Quote paths that may contain spaces (e.g. "C:\Program Files\Python\python.exe")
+  const quotedPython = pythonExecutable.includes(' ') ? `"${pythonExecutable}"` : pythonExecutable;
+  const quotedFilePath = filePath.includes(' ') ? `"${filePath}"` : filePath;
 
   let command = '';
   if (scriptName == 'spin_func')
-    command = `python ${filePath} spin ${funcName}`;
+    command = `${quotedPython} ${quotedFilePath} spin ${funcName}`;
   else
-    command = `python ${filePath} run`;
+    command = `${quotedPython} ${quotedFilePath} run`;
 
   // Reuse or create a single shared terminal
   if (!sharedTerminal || sharedTerminal.exitStatus !== undefined) {
